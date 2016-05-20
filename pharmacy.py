@@ -151,20 +151,3 @@ while(1):
 
 
 
-
-
-
-"""
-try:
-    xmlop=open(str("pharmacy.xml"));
-except IOError:
-    print("파일이 같은 위치에 없어.");
-else:
-    try:
-        dom=parse(xmladdr);
-    except Exception:
-        print("로딩에러")
-    
-parse(xmlop)
-prin
-"""
