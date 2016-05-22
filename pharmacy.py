@@ -6,7 +6,7 @@ Created on Tue May 17 19:54:55 2016
 """
 
 from xml.dom.minidom import *
-
+import webPharmacy
 PharmacyXml=None
 EndFlag=0
 
@@ -20,7 +20,8 @@ def printMenu():
     print("5. 지역약국 html로 출력")
     print("--------------------------------")
     print("6. 사업자 등록")
-    print("7. 종료")
+    print("7. 웹에서 xml불러오기")
+    print("8. 종료")
 
 def menuSelection(num):
     global PharmacyXml
@@ -45,6 +46,9 @@ def menuSelection(num):
         AddPharmacy(dic)
         print("등록완료")
     elif num==7:
+        page=str(input("확인할 페이지를 입력하세요.(최대 21) : "))
+        PharmacyXml=getPharmacyData(page)
+    elif num==8:
         xmlFree()
         global EndFlag
         EndFlag=1
