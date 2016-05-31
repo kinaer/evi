@@ -12,13 +12,7 @@ from email.mime.text import MIMEText
 import smtplib
 from pharmacymodul import *
 
-host = "smtp.gmail.com" # Gmail SMTP 서버 주소.
-port = "587"
 
-server="openapi.e-gen.or.kr/openapi/service/rest/ErmctInsttInfoInqireService/getParmacyBassInfoInqire"
-
-regkey="gb8oDEcLH8PoOl4SPS8OHg1ItD16wUM7Pzji0NyIyQiGeUWCsFc7Vdzic0WSN1tZIJt0NRDyHjvaFeB9DhEcTw%3D%3D"
-conn=None
 def URIcreate(server,**user):
     str=""
     str='http://'+server+'?'

@@ -6,7 +6,7 @@ Created on Tue May 17 19:54:55 2016
 """
 
 
-from webPharmacy import *
+from pharmacymodul import *
 PharmacyXml=None
 EndFlag=0
 
