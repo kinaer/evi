@@ -6,13 +6,16 @@ Created on Wed May 25 22:52:14 2016
 """
 
 from xml.dom.minidom import *
+
 from http.client import HTTPConnection
-from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.request import Request, urlopen
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import smtplib
+import webbrowser
 
+
+PharmacyXml=None
 host = "smtp.gmail.com" # Gmail SMTP 서버 주소.
 port = "587"
 
@@ -20,10 +23,8 @@ server="openapi.e-gen.or.kr/openapi/service/rest/ErmctInsttInfoInqireService/get
 
 regkey="gb8oDEcLH8PoOl4SPS8OHg1ItD16wUM7Pzji0NyIyQiGeUWCsFc7Vdzic0WSN1tZIJt0NRDyHjvaFeB9DhEcTw%3D%3D"
 conn=None
-
-PharmacyXml=None
-
-
+searchItemList=[]
+maps="https://www.google.co.kr/maps/place/"
 
 def URIcreate(server,**user):
     str=""
@@ -34,14 +35,15 @@ def URIcreate(server,**user):
 
 def connetOpenAPI():
     global server, conn
+    #서버 연결 요청
     conn=HTTPConnection(server)
     
-def getPharmacyData(page):
+def getPharmacyData():
     global server, conn,regkey,PharmacyXml
     if conn==None:
         connetOpenAPI()
     #minidom 으로 URL파싱하는 법
-    url=URIcreate(server,serviceKey=regkey,numOfRows="1010",pageNo=page)
+    url=URIcreate(server,serviceKey=regkey,numOfRows="21000",pageNo="1")
     dom=parse(urlopen(url))
     PharmacyXml=dom
     return dom
@@ -77,7 +79,7 @@ def sendMail():
     
     print ("메일 보내기 완료")
     
-    
+   
     #여기까지 웹
  ###############################################################################3   
 def residentPharmacy():
@@ -108,10 +110,10 @@ def residentPharmacy():
     
 
 def xmlFileRead():
-    global PharmacyXml
+    
 #인코딩해줘야되
     try:
-        x=open("pharmacy.xml", encoding="utf8")
+        x=open("pharmacy.xml",encoding="utf8")
     except  IOError:
         print(" 파일 이름이나 경로가 잘못되었습니다.")
         return
@@ -121,7 +123,7 @@ def xmlFileRead():
         print("불러오기 실패")
     else:
         print("정상적으로 XML파일에 연결되었습니다.")
-        PharmacyXml=dom
+    
         return dom
     return
 
@@ -169,10 +171,40 @@ def searchPharmacyAddr(key):
                 print("약국약식 : ",maping.firstChild.nodeValue)
             print("전화번호 : ",tel.firstChild.nodeValue)
 
-
+def displaymap(keyword):
+    global searchItemList,maps
+    if not checkXml():
+        return
+    addr=maps
+    for item in searchItemList:
+        subitem=item.childNodes
+        for a in subitem:
+            if a.nodeName=="dutyName":
+                name=a
+            elif a.nodeName=="wgs84Lat":
+                lat=a
+            elif a.nodeName=="wgs84Lon":
+                lon=a
+        if (name.firstChild.nodeValue.find(keyword)>=0):
+            print(lat.firstChild.nodeValue+"   "+lon.firstChild.nodeValue)
+            """
+            lat1=float(lat.firstChild.nodeValue)
+            lon1=float(lon.firstChild.nodeValue)
+            latDo=int(lat.firstChild.nodeValue)
+            lonDo=int(lon.firstChild.nodeValue)
+            latBun=(lat1-int(lat.firstChild.nodeValue))*60
+            lonBun=(lon1-int(lon.firstChild.nodeValue))*60
+            latCho=(((lat1-latDo)*60)-int((lat1-latDo)*60))*60
+            lonCho=(((lon1-lonDo)*60)-int((lon1-lonDo)*60))*60
+            """
+            latlon=lat.firstChild.nodeValue+","+lon.firstChild.nodeValue
+    addr+=latlon
+    webbrowser.open_new(addr)
+    
+        
 def getAddrToPharmacyList(key):
     global PharmacyXml
-   
+    global searchItemList
     if not checkXml():
         return
     list1=[]
@@ -188,7 +220,9 @@ def getAddrToPharmacyList(key):
                 tel=a
         if (addr.firstChild.nodeValue.find(key)>=0):
             list1.append((name.firstChild.nodeValue,addr.firstChild.nodeValue,tel.firstChild.nodeValue))
+            searchItemList.append(item)
     return list1
+
     """
     try:
         tree=ElementTree.fromstring(str(PharmacyXml.toxml()))
@@ -233,92 +267,97 @@ def AddPharmacy(data):
     global PharmacyXml
     if not checkXml():
         return
+    mDom=xmlFileRead()
+    newPharmacy=mDom.createElement('item')
     
-    newPharmacy=PharmacyXml.createElement('item')
-    
-    addr=PharmacyXml.createElement('dutyAddr')
-    addrText=PharmacyXml.createTextNode(data['dutyAddr'])
+    addr=mDom.createElement('dutyAddr')
+    addrText=mDom.createTextNode(data['dutyAddr'])
     addr.appendChild(addrText)
     newPharmacy.appendChild(addr)
     if data['dutyMapimg']!=None:
-        maping=PharmacyXml.createElement('dutyMapimg')
-        mText=PharmacyXml.createTextNode(data['dutyMapimg'])
+        maping=mDom.createElement('dutyMapimg')
+        mText=mDom.createTextNode(data['dutyMapimg'])
         maping.appendChild(mText)
         newPharmacy.appendChild(maping)
-    name=PharmacyXml.createElement('dutyName')
-    nText=PharmacyXml.createTextNode(data['dutyName'])
+    name=mDom.createElement('dutyName')
+    nText=mDom.createTextNode(data['dutyName'])
     name.appendChild(nText)
     newPharmacy.appendChild(name)
-    tel=PharmacyXml.createElement('dutyTel1')
-    telText=PharmacyXml.createTextNode(data['dutyTel1'])
+    tel=mDom.createElement('dutyTel1')
+    telText=mDom.createTextNode(data['dutyTel1'])
     tel.appendChild(telText)
     newPharmacy.appendChild(tel)
     
-    t1c=PharmacyXml.createElement('dutyTime1c')
-    t1cText=PharmacyXml.createTextNode(data['dutyTime1c'])
+    t1c=mDom.createElement('dutyTime1c')
+    t1cText=mDom.createTextNode(data['dutyTime1c'])
     t1c.appendChild(t1cText)
     newPharmacy.appendChild(t1c)
-    t1s=PharmacyXml.createElement('dutyTime1s')
-    t1sText=PharmacyXml.createTextNode(data['dutyTime1s'])
+    t1s=mDom.createElement('dutyTime1s')
+    t1sText=mDom.createTextNode(data['dutyTime1s'])
     t1s.appendChild(t1sText)
     newPharmacy.appendChild(t1s)
     
-    t2c=PharmacyXml.createElement('dutyTime2c')
-    t2cText=PharmacyXml.createTextNode(data['dutyTime2c'])
+    t2c=mDom.createElement('dutyTime2c')
+    t2cText=mDom.createTextNode(data['dutyTime2c'])
     t2c.appendChild(t2cText)
     newPharmacy.appendChild(t2c)
-    t2s=PharmacyXml.createElement('dutyTime2s')
-    t2sText=PharmacyXml.createTextNode(data['dutyTime2s'])
+    t2s=mDom.createElement('dutyTime2s')
+    t2sText=mDom.createTextNode(data['dutyTime2s'])
     t2s.appendChild(t2sText)
     newPharmacy.appendChild(t2s)
     
-    t3c=PharmacyXml.createElement('dutyTime3c')
-    t3cText=PharmacyXml.createTextNode(data['dutyTime3c'])
+    t3c=mDom.createElement('dutyTime3c')
+    t3cText=mDom.createTextNode(data['dutyTime3c'])
     t3c.appendChild(t3cText)
     newPharmacy.appendChild(t3c)
-    t3s=PharmacyXml.createElement('dutyTime3s')
-    t3sText=PharmacyXml.createTextNode(data['dutyTime3s'])
+    t3s=mDom.createElement('dutyTime3s')
+    t3sText=mDom.createTextNode(data['dutyTime3s'])
     t3s.appendChild(t3sText)
     newPharmacy.appendChild(t3s)
     
-    t4c=PharmacyXml.createElement('dutyTime4c')
-    t4cText=PharmacyXml.createTextNode(data['dutyTime4c'])
+    t4c=mDom.createElement('dutyTime4c')
+    t4cText=mDom.createTextNode(data['dutyTime4c'])
     t4c.appendChild(t4cText)
     newPharmacy.appendChild(t4c)
-    t4s=PharmacyXml.createElement('dutyTime4s')
-    t4sText=PharmacyXml.createTextNode(data['dutyTime4s'])
+    t4s=mDom.createElement('dutyTime4s')
+    t4sText=mDom.createTextNode(data['dutyTime4s'])
     t4s.appendChild(t4sText)
     newPharmacy.appendChild(t4s)
     
-    t5c=PharmacyXml.createElement('dutyTime5c')
-    t5cText=PharmacyXml.createTextNode(data['dutyTime5c'])
+    t5c=mDom.createElement('dutyTime5c')
+    t5cText=mDom.createTextNode(data['dutyTime5c'])
     t5c.appendChild(t5cText)
     newPharmacy.appendChild(t5c)
-    t5s=PharmacyXml.createElement('dutyTime5s')
-    t5sText=PharmacyXml.createTextNode(data['dutyTime5s'])
+    t5s=mDom.createElement('dutyTime5s')
+    t5sText=mDom.createTextNode(data['dutyTime5s'])
     t5s.appendChild(t5sText)
     newPharmacy.appendChild(t5s)
     
-    t6c=PharmacyXml.createElement('dutyTime6c')
-    t6cText=PharmacyXml.createTextNode(data['dutyTime6c'])
+    t6c=mDom.createElement('dutyTime6c')
+    t6cText=mDom.createTextNode(data['dutyTime6c'])
     t6c.appendChild(t6cText)
     newPharmacy.appendChild(t6c)
-    t6s=PharmacyXml.createElement('dutyTime6s')
-    t6sText=PharmacyXml.createTextNode(data['dutyTime6s'])
+    t6s=mDom.createElement('dutyTime6s')
+    t6sText=mDom.createTextNode(data['dutyTime6s'])
     t6s.appendChild(t6sText)
     newPharmacy.appendChild(t6s)
     
-    t7c=PharmacyXml.createElement('dutyTime7c')
-    t7cText=PharmacyXml.createTextNode(data['dutyTime7c'])
+    t7c=mDom.createElement('dutyTime7c')
+    t7cText=mDom.createTextNode(data['dutyTime7c'])
     t7c.appendChild(t7cText)
     newPharmacy.appendChild(t7c)
-    t7s=PharmacyXml.createElement('dutyTime7s')
-    t7sText=PharmacyXml.createTextNode(data['dutyTime7s'])
+    t7s=mDom.createElement('dutyTime7s')
+    t7sText=mDom.createTextNode(data['dutyTime7s'])
     t7s.appendChild(t7sText)
     newPharmacy.appendChild(t7s)
     
-    PharmacyList=PharmacyXml.firstChild
+    PharmacyList=mDom.firstChild
     PharmacyList.appendChild(newPharmacy)
+    print(mDom.toxml())
+    f=open("pharmacy.xml",'w',encoding="utf8")
+    f.write(mDom.toxml())
+    f.close()
+    mDom.unlink()
 
 def xmlFree():
     if checkXml():

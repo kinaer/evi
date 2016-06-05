@@ -11,6 +11,18 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import smtplib
 from pharmacymodul import *
+from pharmacymodul import PharmacyXml
+#import pharmacymodul
+ 
+#from xml.dom.minidom import *
+
+host = "smtp.gmail.com" # Gmail SMTP 서버 주소.
+port = "587"
+
+server="openapi.e-gen.or.kr/openapi/service/rest/ErmctInsttInfoInqireService/getParmacyBassInfoInqire"
+
+regkey="gb8oDEcLH8PoOl4SPS8OHg1ItD16wUM7Pzji0NyIyQiGeUWCsFc7Vdzic0WSN1tZIJt0NRDyHjvaFeB9DhEcTw%3D%3D"
+conn=None
 
 
 def URIcreate(server,**user):
@@ -25,13 +37,14 @@ def connetOpenAPI():
     conn=HTTPConnection(server)
     
 def getPharmacyData(page):
-    global server, conn,regkey
+    global server, conn,regkey, PharmacyXml
     if conn==None:
         connetOpenAPI()
     #minidom 으로 URL파싱하는 법
     url=URIcreate(server,serviceKey=regkey,numOfRows="1010",pageNo=page)
     dom=parse(urlopen(url))
     print(dom.toxml())
+    PharmacyXml=dom
     return dom
     """
     #urllib.urlopen 은 URL로 부터 데이터 얻음
