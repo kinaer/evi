@@ -351,8 +351,10 @@ def AddPharmacy(data):
     t7s.appendChild(t7sText)
     newPharmacy.appendChild(t7s)
     
-    PharmacyList=mDom.firstChild
-    PharmacyList.appendChild(newPharmacy)
+    #HierarchyRequestErr: #text nodes cannot have children 에러가 자꾸떠서 이게 최선인가
+    lis1=mDom.getElementsByTagName("items")
+    lis2=lis1[0]
+    lis2.appendChild(newPharmacy)
     print(mDom.toxml())
     f=open("pharmacy.xml",'w',encoding="utf8")
     f.write(mDom.toxml())

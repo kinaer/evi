@@ -1,13 +1,13 @@
 <?xml version="1.0" ?><response>
 		<header>
-		<resultCode>00</resultCode><resultMsg>NORMAL SERVICE.</resultMsg>
+			<resultCode>00</resultCode><resultMsg>NORMAL SERVICE.</resultMsg>
 		</header>
 		<body>
-		<items>
+			<items>
 
-		</items>
+			</items>
 		<numOfRows>1</numOfRows>
 		<pageNo>1</pageNo>
 		<totalCount>20019</totalCount>
 		</body>
-<item><dutyAddr></dutyAddr><dutyMapimg></dutyMapimg><dutyName></dutyName><dutyTel1></dutyTel1><dutyTime1c></dutyTime1c><dutyTime1s></dutyTime1s><dutyTime2c></dutyTime2c><dutyTime2s></dutyTime2s><dutyTime3c></dutyTime3c><dutyTime3s></dutyTime3s><dutyTime4c></dutyTime4c><dutyTime4s></dutyTime4s><dutyTime5c></dutyTime5c><dutyTime5s></dutyTime5s><dutyTime6c></dutyTime6c><dutyTime6s></dutyTime6s><dutyTime7c></dutyTime7c><dutyTime7s></dutyTime7s></item></response>
+</response>
