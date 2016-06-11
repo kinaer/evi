@@ -1,11 +1,10 @@
-<?xml version="1.0" ?><response>
+﻿<?xml version="1.0" ?><response>
 		<header>
 			<resultCode>00</resultCode><resultMsg>NORMAL SERVICE.</resultMsg>
 		</header>
 		<body>
 			<items>
-
-			</items>
+</items>
 		<numOfRows>1</numOfRows>
 		<pageNo>1</pageNo>
 		<totalCount>20019</totalCount>

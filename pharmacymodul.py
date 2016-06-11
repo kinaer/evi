@@ -83,6 +83,7 @@ def sendMail():
     #여기까지 웹
  ###############################################################################3   
 def residentPharmacy():
+    ##################################################### 사업자 등록 xml파일에 적을 내용들을 기록
     hpid=str(input("사업자 아이디를 입력하세요. : "))
     dutyName=str(input("약국 이름을 입력하세요 : "))
     dutyAddr=str(input("약국 주소를 입력하세요 : "))
@@ -187,16 +188,6 @@ def displaymap(keyword):
                 lon=a
         if (name.firstChild.nodeValue.find(keyword)>=0):
             print(lat.firstChild.nodeValue+"   "+lon.firstChild.nodeValue)
-            """
-            lat1=float(lat.firstChild.nodeValue)
-            lon1=float(lon.firstChild.nodeValue)
-            latDo=int(lat.firstChild.nodeValue)
-            lonDo=int(lon.firstChild.nodeValue)
-            latBun=(lat1-int(lat.firstChild.nodeValue))*60
-            lonBun=(lon1-int(lon.firstChild.nodeValue))*60
-            latCho=(((lat1-latDo)*60)-int((lat1-latDo)*60))*60
-            lonCho=(((lon1-lonDo)*60)-int((lon1-lonDo)*60))*60
-            """
             latlon=lat.firstChild.nodeValue+","+lon.firstChild.nodeValue
     addr+=latlon
     webbrowser.open_new(addr)
@@ -219,7 +210,9 @@ def getAddrToPharmacyList(key):
             elif a.nodeName=="dutyTel1":
                 tel=a
         if (addr.firstChild.nodeValue.find(key)>=0):
-            list1.append((name.firstChild.nodeValue,addr.firstChild.nodeValue,tel.firstChild.nodeValue))
+            list1.append((name.firstChild.nodeValue,
+                          addr.firstChild.nodeValue,
+                          tel.firstChild.nodeValue))
             searchItemList.append(item)
     return list1
 
